@@ -1,8 +1,9 @@
-name: Deploy Hugo Site
+name: Deploy Hugo Site to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main  # 你的主分支名，根据实际情况修改
   workflow_dispatch:
 
 permissions:
@@ -21,87 +22,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          submodules: true  # 拉取Hugo主题子模块
           fetch-depth: 0
 
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
         with:
-          hugo-version: "latest"
-          extended: true
+          hugo-version: 'latest'
+          extended: true  # 需要扩展版本支持Sass等功能
 
       - name: Setup Pages
-        id: pages
         uses: actions/configure-pages@v5
 
-      - name: Install PaperMod theme
-        run: |
-          git clone --depth=1 https://github.com/adityatelange/hugo-PaperMod themes/PaperMod
-
-      - name: Sync content from project
-        run: |
-          CONTENT_DIR="content/posts"
-          mkdir -p "$CONTENT_DIR"
-
-          for dir in 2026*/; do
-            if [ -d "$dir" ]; then
-              year_month=$(basename "$dir")
-              for mdfile in "$dir"*-*-*.md; do
-                if [ -f "$mdfile" ] && [[ "$(basename "$mdfile")" != week* ]]; then
-                  filename=$(basename "$mdfile" .md)
-                  target="$CONTENT_DIR/${filename}.md"
-                  echo "Syncing: $mdfile -> $target"
-
-                  title_line=$(head -1 "$mdfile")
-
-                  cat > "$target" << EOF
-          ---
-          title: "$(echo "$title_line" | sed 's/^# //')"
-          date: "${filename:0:4}-${filename:4:2}-${filename:6:2}"
-          draft: false
-          categories: ["HN深度解读"]
-          tags: $(python3 -c "
-import re, sys, json
-with open('$mdfile', encoding='utf-8') as f:
-    content = f.read()
-tags = re.findall(r'🤖|✨|🔒|⚠️|🚀|💻|🎮|🌍|💡|🔍|🛡️|📖|📚|😤|🏆|📊|🔄|🧪', content)
-tag_map = {'🤖':'AI','✨':'开源','🔒':'安全','⚠️':'警告','🚀':'航天','💻':'开发','🎮':'游戏','🌍':'地缘','💡':'洞察','🔍':'分析','🛡️':'隐私','📖':'人文','📚':'知识管理','😤':'争议','🏆':'热门','📊':'商业','🔄':'重构','🧪':'实验'}
-unique_tags = list(dict.fromkeys(tag_map.get(t, t) for t in tags))
-print(json.dumps(unique_tags[:5]))
-" 2>/dev/null || echo '["技术"]')
-          ---
-          $(cat "$mdfile")
-          EOF
-                fi
-              done
-            fi
-          done
-
-          WEEK_DIR="content/archives"
-          mkdir -p "$WEEK_DIR"
-          for dir in 2026*/; do
-            if [ -d "$dir" ]; then
-              for weekfile in "$dir"week*.md; do
-                if [ -f "$weekfile" ]; then
-                  filename=$(basename "$weekfile" .md)
-                  cp "$weekfile" "$WEEK_DIR/$filename.md"
-                fi
-              done
-            fi
-          done
-
-          echo "Content synced. Posts: $(ls $CONTENT_DIR/*.md 2>/dev/null | wc -l)"
-
       - name: Build with Hugo
-        env:
-          HUGO_ENVIRONMENT: production
-          HUGO_ENV: production
-        run: |
-          hugo --minify --gc --baseURL "${{ steps.pages.outputs.base_url }}/"
+        run: hugo --minify --gc --config .github/config.toml  # 构建并压缩静态资源，指定配置文件路径
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: public
+          path: ./public
 
   deploy:
     environment:
@@ -112,4 +51,4 @@ print(json.dumps(unique_tags[:5]))
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: deploy-pages@v4
+        uses: actions/deploy-pages@v4
