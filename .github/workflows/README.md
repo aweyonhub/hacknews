@@ -28,7 +28,7 @@ Settings → Pages → Source: **GitHub Actions**
 
 ### 3. 修改配置
 
-编辑 `.claude/asset/github/hugo/hugo.toml`：
+编辑 `.github/workflows/hogo/hugo.toml`：
 ```toml
 baseURL = 'https://aweyonhub.github.io/hacknews/'
 ```

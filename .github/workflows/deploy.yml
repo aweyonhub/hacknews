@@ -39,7 +39,7 @@ jobs:
 
       - name: Sync content from project
         run: |
-          CONTENT_DIR=".claude/asset/github/hugo/content/posts"
+          CONTENT_DIR="content/posts"
           mkdir -p "$CONTENT_DIR"
 
           for dir in 2026*/; do
@@ -76,8 +76,7 @@ print(json.dumps(unique_tags[:5]))
             fi
           done
 
-          # Also copy week files as special pages
-          WEEK_DIR=".claude/asset/github/hugo/content/archives"
+          WEEK_DIR="content/archives"
           mkdir -p "$WEEK_DIR"
           for dir in 2026*/; do
             if [ -d "$dir" ]; then
@@ -97,13 +96,12 @@ print(json.dumps(unique_tags[:5]))
           HUGO_ENVIRONMENT: production
           HUGO_ENV: production
         run: |
-          cd .claude/asset/github/hugo
           hugo --minify --gc --baseURL "${{ steps.pages.outputs.base_url }}/"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .claude/asset/github/hugo/public
+          path: public
 
   deploy:
     environment:
@@ -114,4 +112,4 @@ print(json.dumps(unique_tags[:5]))
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: deploy-pages@v4
