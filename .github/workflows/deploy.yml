@@ -76,14 +76,12 @@ jobs:
                 cp "$file" ./hugo/content/posts/
               fi
             else
-              # 没有 front matter，添加完整的 front matter
-              cat > ./hugo/content/posts/"$filename" << EOF
----
-title: "${title}"
-date: $year-$month-$dayT00:00:00+08:00
----
-$content
-EOF
+              # 没有 front matter，添加完整的 front matter（不使用here-document避免冲突）
+              echo "---" > ./hugo/content/posts/"$filename"
+              echo "title: \"${title}\"" >> ./hugo/content/posts/"$filename"
+              echo "date: $year-$month-$dayT00:00:00+08:00" >> ./hugo/content/posts/"$filename"
+              echo "---" >> ./hugo/content/posts/"$filename"
+              echo "$content" >> ./hugo/content/posts/"$filename"
             fi
           done
           
@@ -98,14 +96,12 @@ EOF
             # 读取内容
             content=$(cat "$file")
             
-            # 添加 front matter
-            cat > ./hugo/content/weeks/"$filename" << EOF
----
-title: "${year}年${month}月 第${week_num}周热点"
-date: ${year}-${month}-01T00:00:00+08:00
----
-$content
-EOF
+            # 添加 front matter（不使用here-document避免冲突）
+            echo "---" > ./hugo/content/weeks/"$filename"
+            echo "title: \"${year}年${month}月 第${week_num}周热点\"" >> ./hugo/content/weeks/"$filename"
+            echo "date: ${year}-${month}-01T00:00:00+08:00" >> ./hugo/content/weeks/"$filename"
+            echo "---" >> ./hugo/content/weeks/"$filename"
+            echo "$content" >> ./hugo/content/weeks/"$filename"
           done
 
       - name: 构建 Hugo 站点
