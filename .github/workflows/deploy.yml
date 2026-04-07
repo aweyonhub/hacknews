@@ -22,7 +22,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          submodules: true  # 拉取Hugo主题子模块
+          submodules: 'recursive'  # 递归拉取所有子模块，包括主题
           fetch-depth: 0
 
       - name: Setup Hugo
