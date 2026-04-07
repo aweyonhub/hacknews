@@ -1,4 +1,4 @@
-baseURL = 'https://<your-username>.github.io/hacknews/'
+baseURL = 'https://aweyonhub.github.io/hacknews/'
 languageCode = 'zh-cn'
 title = 'HackNews Digest'
 theme = ['PaperMod']
@@ -65,7 +65,7 @@ Content = """
 
 [[params.socialIcons]]
 name = "github"
-url = "https://github.com/<your-username>/hacknews"
+url = "https://github.com/aweyonhub/hacknews"
 
 [params.cover]
 hidden = true

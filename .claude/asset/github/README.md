@@ -18,7 +18,7 @@ cd hacknews
 git init
 git add .
 git commit -m "init: HackNews Digest project"
-git remote add origin https://github.com/<your-username>/hacknews.git
+git remote add origin git@github.com:aweyonhub/hacknews.git
 git push -u origin main
 ```
 
@@ -30,12 +30,12 @@ Settings → Pages → Source: **GitHub Actions**
 
 编辑 `.claude/asset/github/hugo/hugo.toml`：
 ```toml
-baseURL = 'https://<your-username>.github.io/hacknews/'
+baseURL = 'https://aweyonhub.github.io/hacknews/'
 ```
 
 编辑 `.claude/asset/github/deploy.yml` 中 socialIcons 的 URL：
 ```yaml
-url = "https://github.com/<your-username>/hacknews"
+url = "https://github.com/aweyonhub/hacknews"
 ```
 
 ### 4. 推送即部署
@@ -107,6 +107,6 @@ hugo server -D --bind 0.0.0.0 --baseURL http://localhost:1313/
    A     185.199.109.153
    A     185.199.110.153
    A     185.199.111.153
-   CNAME  <your-username>.github.io.
+   CNAME  aweyonhub.github.io.
    ```
 3. 更新 `hugo.toml` 的 `baseURL`
