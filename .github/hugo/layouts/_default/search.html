@@ -1,0 +1,37 @@
+{{ define "main" }}
+  <h1>{{ .Title }}</h1>
+  <div id="search-box">
+    <input
+      id="search-input"
+      class="search-input"
+      type="search"
+      placeholder="搜索文章标题和内容..."
+      aria-label="Search"
+    />
+  </div>
+  <div id="search-results" class="search-results"></div>
+  <script id="search-results-template" type="text/mustache-template">
+    {{`{{#results}}`}}
+    <article class="post-entry">
+      <header class="entry-header">
+        <h2>{{`{{.title}}`}}</h2>
+      </header>
+      {{`{{#summary}}`}}
+      <div class="entry-content">
+        <p>{{`{{.summary}}`}}</p>
+      </div>
+      {{`{{/summary}}`}}
+      <footer class="entry-footer">
+        <span>{{`{{.date}}`}}</span>
+      </footer>
+      <a class="entry-link" aria-label="post link to {{`{{.title}}`}}" href="{{`{{.permalink}}`}}"></a>
+    </article>
+    {{`{{/results}}`}}
+    {{`{{^results}}`}}
+    <p>没有找到匹配的内容</p>
+    {{`{{/results}}`}}
+  </script>
+
+  <script src="/js/fuse.min.js"></script>
+  <script src="/js/search.js"></script>
+{{ end }}

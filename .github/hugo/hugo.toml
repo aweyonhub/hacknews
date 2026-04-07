@@ -1,0 +1,59 @@
+baseURL = "https://yourusername.github.io/hacknews/"
+languageCode = "zh-cn"
+title = "HackNews Digest"
+theme = "PaperMod"
+
+[params]
+  env = "production"
+  title = "HackNews Digest"
+  description = "Hacker News 热点新闻深度归档系统 — 每日 Top 10 采集 + 精选文章深度解读 + 周度趋势分析"
+  keywords = ["Hacker News", "科技新闻", "深度解读", "技术趋势"]
+  author = "HackNews Digest"
+  DateFormat = "2006-01-02"
+  defaultTheme = "auto"
+  disableThemeToggle = false
+  disableSpecial1stPost = false
+  disableScrollToTop = false
+  disableAnchoredHeadings = false
+  ShowReadingTime = true
+  ShowShareButtons = true
+  ShowPostNavLinks = true
+  ShowBreadCrumbs = true
+  ShowCodeCopyButtons = true
+  ShowWordCount = true
+  ShowRssButtonInSectionTermList = true
+  UseHugoToc = true
+  disableLanguageSwitchButton = true
+
+[params.search]
+  enable = true
+  searchHidden = false
+
+  [params.search.fuseOpts]
+    isCaseSensitive = false
+    keys = ["title", "content", "tags", "categories"]
+    minMatchCharLength = 2
+    threshold = 0.3
+
+[menu]
+  [[menu.main]]
+    identifier = "archives"
+    name = "归档"
+    url = "/archives/"
+    weight = 10
+
+  [[menu.main]]
+    identifier = "search"
+    name = "搜索"
+    url = "/search/"
+    weight = 20
+
+  [[menu.main]]
+    identifier = "github"
+    name = "GitHub"
+    url = "https://github.com/yourusername/hacknews"
+    weight = 30
+    params.external = true
+
+[outputs]
+  home = ["HTML", "RSS", "JSON"]
