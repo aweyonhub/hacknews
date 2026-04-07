@@ -35,6 +35,9 @@ cp README.md .github/hugo/content/_index.md
 # 给 index 添加 front matter
 sed -i '1s/^/---\ntitle: HackNews Digest\n---\n\n/' .github/hugo/content/_index.md
 
+find .github/hugo/content -name "*.md" -exec sed -i 's/\(\[[^]]*\]([^)]*\)\.md\([#)]\)/\1\2/g' {} \;
+find .github/hugo/content -name "*.md" -exec sed -i 's/\(\[[^]]*\]([^)]*\)\.md$/\1/g' {} \;
+
 # 4. 启动本地开发服务器
 cd .github/hugo
 hugo server -D
