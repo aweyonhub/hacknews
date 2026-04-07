@@ -3,6 +3,14 @@ languageCode = "zh-cn"
 title = "HackNews Digest"
 theme = "PaperMod"
 
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+    [markup.goldmark.parser]
+      [markup.goldmark.parser.parse_block]
+        template = false  # 禁用解析markdown中的{{}}模板指令，避免与代码块冲突
+
 [params]
   env = "production"
   title = "HackNews Digest"
