@@ -58,22 +58,54 @@ jobs:
             year=${date_part:0:4}
             month=${date_part:4:2}
             day=${date_part:6:2}
+            # 提取标题（去掉日期和后缀）
+            title=${filename:9:-3}
+            title=${title//-/ }
             
-            # 复制到 posts 目录
-            cp "$file" ./hugo/content/posts/
+            # 读取文件内容
+            content=$(cat "$file")
             
-            # 添加 front matter 中的 date 字段（如果没有）
-            post_file="./hugo/content/posts/$filename"
-            if ! grep -q "^date:" "$post_file"; then
-              # 在 front matter 开头添加 date
-              sed -i "2i date: $year-$month-$dayT00:00:00+08:00" "$post_file"
+            # 检查是否已有 front matter
+            if [[ $content == ---* ]]; then
+              # 已有 front matter，检查是否有 date 字段
+              if ! echo "$content" | grep -q "^date:"; then
+                # 在 front matter 中添加 date 字段（第二个 --- 之前）
+                new_content=$(echo "$content" | sed "0,/^---/! {0,/^---/ s/^---/date: $year-$month-$dayT00:00:00+08:00\n---/}")
+                echo "$new_content" > ./hugo/content/posts/"$filename"
+              else
+                cp "$file" ./hugo/content/posts/
+              fi
+            else
+              # 没有 front matter，添加完整的 front matter
+              cat > ./hugo/content/posts/"$filename" << EOF
+---
+title: "${title}"
+date: $year-$month-$dayT00:00:00+08:00
+---
+$content
+EOF
             fi
           done
           
           # 复制 week*.md 到 hugo/content/weeks/
           find ./ -path "./202*" -name "week*.md" | while read file; do
             filename=$(basename "$file")
-            cp "$file" ./hugo/content/weeks/
+            # 提取周数和年月
+            week_num=$(echo "$filename" | grep -o "[0-9]\+" | head -1)
+            year=${filename:0:4}
+            month=${filename:4:2}
+            
+            # 读取内容
+            content=$(cat "$file")
+            
+            # 添加 front matter
+            cat > ./hugo/content/weeks/"$filename" << EOF
+---
+title: "${year}年${month}月 第${week_num}周热点"
+date: ${year}-${month}-01T00:00:00+08:00
+---
+$content
+EOF
           done
 
       - name: 构建 Hugo 站点
