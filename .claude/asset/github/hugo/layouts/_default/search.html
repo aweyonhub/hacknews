@@ -1,0 +1,84 @@
+{{ define "main" }}
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">{{ .Title }}</h1>
+  </header>
+
+  <div class="post-content">
+    <input id="search-input" type="search" placeholder="输入关键词搜索全站内容..." autocomplete="off" autofocus style="width:100%;padding:12px 16px;font-size:16px;border:2px solid var(--border);border-radius:8px;outline:none;margin-bottom:20px;">
+    <div id="search-results" style="min-height:200px;"></div>
+    <div id="search-hint" style="color:var(--tertiary);text-align:center;padding:40px 0;font-size:14px;">开始输入以搜索...</div>
+  </div>
+</article>
+{{ end }}
+
+{{ define "scripts" }}
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
+<script>
+const fuseOptions = {
+  isCaseSensitive: false,
+  minMatchCharLength: 2,
+  limit: 30,
+  keys: [
+    { name: "title", weight: 0.8 },
+    { name: "summary", weight: 0.5 },
+    { name: "content", weight: 0.3 },
+    { name: "tags", weight: 0.4 }
+  ]
+};
+
+let fuse;
+let indexData = [];
+
+fetch('/index.json')
+  .then(res => res.json())
+  .then(data => {
+    indexData = data.map(item => ({
+      title: item.title,
+      summary: item.summary || '',
+      content: (item.plain || '').slice(0, 3000),
+      tags: (item.tags || []).join(' '),
+      permalink: item.permalink
+    }));
+    fuse = new Fuse(indexData, fuseOptions);
+  });
+
+const input = document.getElementById('search-input');
+const results = document.getElementById('search-results');
+const hint = document.getElementById('search-hint');
+
+function renderResults(items) {
+  if (!items.length) {
+    results.innerHTML = '<p style="text-align:center;color:var(--tertiary);padding:40px 0;">未找到匹配结果</p>';
+    hint.style.display = 'none';
+    return;
+  }
+  hint.style.display = 'none';
+
+  let html = '<ul style="list-style:none;padding:0;">';
+  items.forEach(item => {
+    const score = Math.round((1 - item.score) * 100);
+    html += `
+      <li style="margin-bottom:16px;padding:16px;border-radius:8px;background:var(--code-bg);border-left:3px solid var(--primary);">
+        <a href="${item.item.permalink}" style="font-size:17px;font-weight:600;text-decoration:none;color:var(--content);">${item.item.title}</a>
+        <span style="margin-left:8px;font-size:12px;color:var(--tertiary);background:var(--code-bg);padding:2px 8px;border-radius:4px;">${score}%</span>
+        ${item.item.summary ? `<p style="margin:6px 0 0;color:var(--tertiary);font-size:14px;line-height:1.6;">${item.item.summary.slice(0, 150)}...</p>` : ''}
+        ${item.item.tags ? `<div style="margin-top:6px;"><small>${item.item.tags.split(/\s+/).filter(t=>t).map(t => '<span style="display:inline-block;margin-right:4px;padding:1px 8px;font-size:11px;background:var(--border);border-radius:10px;color:var(--tertiary);">'+t+'</span>').join('')}</small></div>` : ''}
+      </li>`;
+  });
+  html += '</ul>';
+  results.innerHTML = html;
+}
+
+let debounceTimer;
+input.addEventListener('input', () => {
+  clearTimeout(debounceTimer);
+  const query = input.value.trim();
+  if (!query) { results.innerHTML = ''; hint.style.display = ''; return; }
+  debounceTimer = setTimeout(() => {
+    if (!fuse) return;
+    renderResults(fuse.search(query));
+  }, 250);
+});
+</script>
+{{ end }}

@@ -1,0 +1,117 @@
+name: Deploy Hugo Site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: "latest"
+          extended: true
+
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Install PaperMod theme
+        run: |
+          git clone --depth=1 https://github.com/adityatelange/hugo-PaperMod themes/PaperMod
+
+      - name: Sync content from project
+        run: |
+          CONTENT_DIR=".claude/asset/github/hugo/content/posts"
+          mkdir -p "$CONTENT_DIR"
+
+          for dir in 2026*/; do
+            if [ -d "$dir" ]; then
+              year_month=$(basename "$dir")
+              for mdfile in "$dir"*-*-*.md; do
+                if [ -f "$mdfile" ] && [[ "$(basename "$mdfile")" != week* ]]; then
+                  filename=$(basename "$mdfile" .md)
+                  target="$CONTENT_DIR/${filename}.md"
+                  echo "Syncing: $mdfile -> $target"
+
+                  title_line=$(head -1 "$mdfile")
+
+                  cat > "$target" << EOF
+          ---
+          title: "$(echo "$title_line" | sed 's/^# //')"
+          date: "${filename:0:4}-${filename:4:2}-${filename:6:2}"
+          draft: false
+          categories: ["HN深度解读"]
+          tags: $(python3 -c "
+import re, sys, json
+with open('$mdfile', encoding='utf-8') as f:
+    content = f.read()
+tags = re.findall(r'🤖|✨|🔒|⚠️|🚀|💻|🎮|🌍|💡|🔍|🛡️|📖|📚|😤|🏆|📊|🔄|🧪', content)
+tag_map = {'🤖':'AI','✨':'开源','🔒':'安全','⚠️':'警告','🚀':'航天','💻':'开发','🎮':'游戏','🌍':'地缘','💡':'洞察','🔍':'分析','🛡️':'隐私','📖':'人文','📚':'知识管理','😤':'争议','🏆':'热门','📊':'商业','🔄':'重构','🧪':'实验'}
+unique_tags = list(dict.fromkeys(tag_map.get(t, t) for t in tags))
+print(json.dumps(unique_tags[:5]))
+" 2>/dev/null || echo '["技术"]')
+          ---
+          $(cat "$mdfile")
+          EOF
+                fi
+              done
+            fi
+          done
+
+          # Also copy week files as special pages
+          WEEK_DIR=".claude/asset/github/hugo/content/archives"
+          mkdir -p "$WEEK_DIR"
+          for dir in 2026*/; do
+            if [ -d "$dir" ]; then
+              for weekfile in "$dir"week*.md; do
+                if [ -f "$weekfile" ]; then
+                  filename=$(basename "$weekfile" .md)
+                  cp "$weekfile" "$WEEK_DIR/$filename.md"
+                fi
+              done
+            fi
+          done
+
+          echo "Content synced. Posts: $(ls $CONTENT_DIR/*.md 2>/dev/null | wc -l)"
+
+      - name: Build with Hugo
+        env:
+          HUGO_ENVIRONMENT: production
+          HUGO_ENV: production
+        run: |
+          cd .claude/asset/github/hugo
+          hugo --minify --gc --baseURL "${{ steps.pages.outputs.base_url }}/"
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .claude/asset/github/hugo/public
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
