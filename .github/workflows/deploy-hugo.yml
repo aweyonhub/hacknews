@@ -1,0 +1,92 @@
+name: 部署 Hugo 站点到 GitHub Pages
+
+on:
+  push:
+    branches:
+      - main  # 你的主分支名
+    paths:
+      - 'hacknews/202*/*.md'  # 监控新闻文件变动
+      - 'hugo/**'            # 监控 Hugo 配置变动
+  workflow_dispatch:         # 支持手动触发
+
+# 设置 GITHUB_TOKEN 的权限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 允许一个并发部署
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # 构建 Hugo 站点
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive  # 拉取主题子模块
+          fetch-depth: 0
+
+      - name: 安装 Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: 'latest'
+          extended: true  # 需要 extended 版本处理 SCSS
+
+      - name: 设置 Pages
+        uses: actions/configure-pages@v5
+
+      - name: 同步 Markdown 文章到 Hugo 内容目录
+        run: |
+          # 复制所有月度目录下的 md 文件到 hugo/content/posts/
+          find ./hacknews -path "./hacknews/202*" -name "*.md" -not -name "week*.md" | while read file; do
+            filename=$(basename "$file")
+            # 解析文件名：YYYYMMdd-中文标题-EnglishTitle.md
+            date_part=${filename:0:8}
+            year=${date_part:0:4}
+            month=${date_part:4:2}
+            day=${date_part:6:2}
+            
+            # 复制到 posts 目录
+            cp "$file" ./hugo/content/posts/
+            
+            # 添加 front matter 中的 date 字段（如果没有）
+            post_file="./hugo/content/posts/$filename"
+            if ! grep -q "^date:" "$post_file"; then
+              # 在 front matter 开头添加 date
+              sed -i "2i date: $year-$month-$dayT00:00:00+08:00" "$post_file"
+            fi
+          done
+          
+          # 复制 week*.md 到 hugo/content/weeks/
+          mkdir -p ./hugo/content/weeks
+          find ./hacknews -path "./hacknews/202*" -name "week*.md" | while read file; do
+            filename=$(basename "$file")
+            cp "$file" ./hugo/content/weeks/
+          done
+
+      - name: 构建 Hugo 站点
+        run: |
+          cd ./hugo
+          hugo --minify --baseURL "${{ steps.pages.outputs.base_url }}/"
+
+      - name: 上传构建产物
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./hugo/public
+
+  # 部署到 GitHub Pages
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: 部署到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
