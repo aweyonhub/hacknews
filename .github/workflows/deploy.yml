@@ -44,9 +44,6 @@ jobs:
           # Add front matter to index
           sed -i '1s/^/---\ntitle: HackNews Digest\n---\n\n/' .github/hugo/content/_index.md
           
-          # Remove .md suffix from all markdown links
-          find .github/hugo/content -name "*.md" -exec sed -i 's/\(\[[^]]*\]([^)]*\)\.md\([#)]\)/\1\2/g' {} \;
-          find .github/hugo/content -name "*.md" -exec sed -i 's/\(\[[^]]*\]([^)]*\)\.md$/\1/g' {} \;
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
