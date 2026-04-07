@@ -14,7 +14,7 @@ theme = "PaperMod"
   searchHidden = false
   
   # 主题模式
-  defaultTheme = auto  # auto / light / dark
+  defaultTheme = "auto"  # auto / light / dark
   disableThemeToggle = false
   
   # 代码高亮
