@@ -5,7 +5,7 @@ on:
     branches:
       - main  # 你的主分支名
     paths:
-      - 'hacknews/202*/*.md'  # 监控新闻文件变动
+      - '202*/*.md'  # 监控新闻文件变动（根目录下的月度目录）
       - 'hugo/**'            # 监控 Hugo 配置变动
   workflow_dispatch:         # 支持手动触发
 
@@ -43,7 +43,7 @@ jobs:
       - name: 同步 Markdown 文章到 Hugo 内容目录
         run: |
           # 复制所有月度目录下的 md 文件到 hugo/content/posts/
-          find ./hacknews -path "./hacknews/202*" -name "*.md" -not -name "week*.md" | while read file; do
+          find ./ -path "./202*" -name "*.md" -not -name "week*.md" | while read file; do
             filename=$(basename "$file")
             # 解析文件名：YYYYMMdd-中文标题-EnglishTitle.md
             date_part=${filename:0:8}
@@ -64,7 +64,7 @@ jobs:
           
           # 复制 week*.md 到 hugo/content/weeks/
           mkdir -p ./hugo/content/weeks
-          find ./hacknews -path "./hacknews/202*" -name "week*.md" | while read file; do
+          find ./ -path "./202*" -name "week*.md" | while read file; do
             filename=$(basename "$file")
             cp "$file" ./hugo/content/weeks/
           done
