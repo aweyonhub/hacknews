@@ -46,6 +46,10 @@ jobs:
 
       - name: 同步 Markdown 文章到 Hugo 内容目录
         run: |
+          # 先创建必要目录
+          mkdir -p ./hugo/content/posts
+          mkdir -p ./hugo/content/weeks
+          
           # 复制所有月度目录下的 md 文件到 hugo/content/posts/
           find ./ -path "./202*" -name "*.md" -not -name "week*.md" | while read file; do
             filename=$(basename "$file")
@@ -67,7 +71,6 @@ jobs:
           done
           
           # 复制 week*.md 到 hugo/content/weeks/
-          mkdir -p ./hugo/content/weeks
           find ./ -path "./202*" -name "week*.md" | while read file; do
             filename=$(basename "$file")
             cp "$file" ./hugo/content/weeks/
