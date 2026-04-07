@@ -28,7 +28,6 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
         with:
-          submodules: recursive  # 拉取主题子模块
           fetch-depth: 0
 
       - name: 安装 Hugo
@@ -36,6 +35,11 @@ jobs:
         with:
           hugo-version: 'latest'
           extended: true  # 需要 extended 版本处理 SCSS
+
+      - name: 拉取 PaperMod 主题
+        run: |
+          rm -rf ./hugo/themes/PaperMod
+          git clone https://github.com/adityatelange/hugo-PaperMod.git ./hugo/themes/PaperMod --depth 1
 
       - name: 设置 Pages
         uses: actions/configure-pages@v5
