@@ -62,27 +62,24 @@ jobs:
             title=${filename:9:-3}
             title=${title//-/ }
             
-            # 读取文件内容
-            content=$(cat "$file")
+            # 读取文件内容，删除所有旧的front matter（如果有）
+            content=$(sed '1,/^---$/d' "$file" | sed '1,/^---$/d' || cat "$file")
             
-            # 检查是否已有 front matter
-            if [[ $content == ---* ]]; then
-              # 已有 front matter，检查是否有 date 字段
-              if ! echo "$content" | grep -q "^date:"; then
-                # 在 front matter 中添加 date 字段（第二个 --- 之前）
-                new_content=$(echo "$content" | sed "0,/^---/! {0,/^---/ s/^---/date: $year-$month-$dayT00:00:00+08:00\n---/}")
-                echo "$new_content" > ./hugo/content/posts/"$filename"
-              else
-                cp "$file" ./hugo/content/posts/
-              fi
-            else
-              # 没有 front matter，添加完整的 front matter（不使用here-document避免冲突）
-              echo "---" > ./hugo/content/posts/"$filename"
-              echo "title: \"${title}\"" >> ./hugo/content/posts/"$filename"
-              echo "date: $year-$month-$dayT00:00:00+08:00" >> ./hugo/content/posts/"$filename"
-              echo "---" >> ./hugo/content/posts/"$filename"
-              echo "$content" >> ./hugo/content/posts/"$filename"
-            fi
+            # 添加统一的front matter
+            cat > ./hugo/content/posts/"$filename" << 'EOF'
+---
+title: "REPLACE_TITLE"
+date: REPLACE_DATE
+---
+REPLACE_CONTENT
+EOF
+            
+            # 替换内容
+            sed -i "s/REPLACE_TITLE/${title//\//\\/}/g" ./hugo/content/posts/"$filename"
+            sed -i "s/REPLACE_DATE/$year-$month-$day/g" ./hugo/content/posts/"$filename"
+            # 替换内容，转义特殊字符
+            escaped_content=$(echo "$content" | sed 's/[\/&]/\\&/g')
+            sed -i "s/REPLACE_CONTENT/$escaped_content/g" ./hugo/content/posts/"$filename"
           done
           
           # 复制 week*.md 到 hugo/content/weeks/
@@ -96,12 +93,20 @@ jobs:
             # 读取内容
             content=$(cat "$file")
             
-            # 添加 front matter（不使用here-document避免冲突）
-            echo "---" > ./hugo/content/weeks/"$filename"
-            echo "title: \"${year}年${month}月 第${week_num}周热点\"" >> ./hugo/content/weeks/"$filename"
-            echo "date: ${year}-${month}-01T00:00:00+08:00" >> ./hugo/content/weeks/"$filename"
-            echo "---" >> ./hugo/content/weeks/"$filename"
-            echo "$content" >> ./hugo/content/weeks/"$filename"
+            # 添加统一的front matter
+            cat > ./hugo/content/weeks/"$filename" << 'EOF'
+---
+title: "REPLACE_TITLE"
+date: REPLACE_DATE
+---
+REPLACE_CONTENT
+EOF
+            
+            # 替换内容
+            sed -i "s/REPLACE_TITLE/${year}年${month}月 第${week_num}周热点/g" ./hugo/content/weeks/"$filename"
+            sed -i "s/REPLACE_DATE/$year-$month-01/g" ./hugo/content/weeks/"$filename"
+            escaped_content=$(echo "$content" | sed 's/[\/&]/\\&/g')
+            sed -i "s/REPLACE_CONTENT/$escaped_content/g" ./hugo/content/weeks/"$filename"
           done
 
       - name: 构建 Hugo 站点
