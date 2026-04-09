@@ -1,0 +1,76 @@
+name: 部署 Hugo 网站到 GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '2026*/*.md'
+      - 'README.md'
+      - '.github/hugo/**'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  构建:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: 安装 Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: 'latest'
+          extended: true
+
+      - name: 同步内容到 Hugo 目录
+        run: |
+          # 复制所有 markdown 内容
+          cp -r 2026* .github/hugo/content/
+          cp README.md .github/hugo/content/_index.md
+          
+          # 添加 front matter 到首页
+          sed -i '1s/^/---\ntitle: HackNews Digest\n---\n\n/' .github/hugo/content/_index.md
+          
+          # 移除所有 markdown 链接中的 .md 后缀
+          find .github/hugo/content -name "*.md" -exec sed -i 's/\(\[[^]]*\]([^)]*\)\.md\([#)]\)/\1\2/g' {} \;
+          find .github/hugo/content -name "*.md" -exec sed -i 's/\(\[[^]]*\]([^)]*\)\.md$/\1/g' {} \;
+
+      - name: 设置 Pages
+        uses: actions/configure-pages@v4
+
+      - name: 使用 Hugo 构建
+        working-directory: .github/hugo
+        run: |
+          hugo \
+            --minify \
+            --baseURL "${{ steps.pages.outputs.base_url }}/"
+
+      - name: 上传构建产物
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .github/hugo/public
+
+  部署:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: 构建
+    steps:
+      - name: 部署到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
