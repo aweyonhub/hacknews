@@ -1,0 +1,56 @@
+{{- define "main" }}
+
+<div class="section-wrap">
+
+  <header class="section-header">
+    <h1>{{ .Title }}</h1>
+    {{- with .Content }}
+      <div class="section-intro">{{ . }}</div>
+    {{- end }}
+  </header>
+
+  {{/* 分离周度索引和深度解读文章 */}}
+  {{- $weeks    := slice }}
+  {{- $articles := slice }}
+  {{- range .Pages }}
+    {{- if and .File (hasPrefix .File.BaseFileName "week") }}
+      {{- $weeks = $weeks | append . }}
+    {{- else }}
+      {{- $articles = $articles | append . }}
+    {{- end }}
+  {{- end }}
+
+  {{/* 周度索引列表 */}}
+  {{- if $weeks }}
+  <section class="group-section">
+    <h2 class="group-title">📅 周度索引</h2>
+    <ul class="week-list">
+      {{- range sort $weeks "Title" "asc" }}
+        <li>
+          <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+        </li>
+      {{- end }}
+    </ul>
+  </section>
+  {{- end }}
+
+  {{/* 深度解读文章列表 */}}
+  {{- if $articles }}
+  <section class="group-section">
+    <h2 class="group-title">📝 深度解读（{{ len $articles }} 篇）</h2>
+    <ul class="article-list">
+      {{- range $articles.ByDate.Reverse }}
+        <li class="article-item">
+          <a href="{{ .RelPermalink }}" class="article-link">{{ .Title }}</a>
+          {{- if not .Date.IsZero }}
+            <time class="article-meta">{{ .Date.Format "01月02日" }}</time>
+          {{- end }}
+        </li>
+      {{- end }}
+    </ul>
+  </section>
+  {{- end }}
+
+</div>
+
+{{- end }}
