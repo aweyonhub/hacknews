@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="{{ if .IsHome }}{{ .Site.Params.description }}{{ else }}{{ with .Summary }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}{{ end }}" />
+
+  <title>
+    {{- if .IsHome -}}
+      {{ .Site.Title }}
+    {{- else -}}
+      {{ .Title }} | {{ .Site.Title }}
+    {{- end -}}
+  </title>
+
+  <link rel="stylesheet" href="{{ "css/style.css" | relURL }}" />
+</head>
+<body>
+
+  <!-- 顶部导航栏 -->
+  <header class="site-header">
+    <nav class="nav-inner">
+      <a href="{{ "/" | relURL }}" class="nav-logo">📰 HackNews Digest</a>
+
+      <div class="nav-sections">
+        {{- range (sort .Site.Sections "Section" "desc") }}
+          <a href="{{ .RelPermalink }}"
+            {{- if eq $.Section .Section }} class="active"{{ end }}>
+            {{ .Title }}
+          </a>
+        {{- end }}
+      </div>
+    </nav>
+  </header>
+
+  <!-- 面包屑导航（非首页时显示） -->
+  {{- if not .IsHome }}
+  <div class="breadcrumb-wrap">
+    <div class="breadcrumb-inner">
+      <a href="{{ "/" | relURL }}">首页</a>
+      {{- if .Parent }}
+        <span class="sep">›</span>
+        <a href="{{ .Parent.RelPermalink }}">{{ .Parent.Title }}</a>
+      {{- end }}
+      <span class="sep">›</span>
+      <span>{{ .Title }}</span>
+    </div>
+  </div>
+  {{- end }}
+
+  <!-- 主体内容 -->
+  <main class="site-main">
+    {{- block "main" . }}{{- end }}
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span>HackNews Digest — Hacker News 热点新闻深度归档系统</span>
+      {{- with .Site.Params.github }}
+        <span class="sep">·</span>
+        <a href="{{ . }}" target="_blank" rel="noopener">GitHub</a>
+      {{- end }}
+    </div>
+  </footer>
+
+</body>
+</html>

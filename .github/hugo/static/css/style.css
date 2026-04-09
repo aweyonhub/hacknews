@@ -1,0 +1,503 @@
+/* ===================================================
+   HackNews Digest — 站点样式
+   设计风格：简洁克制，以内容为中心，HN橙色为主色调
+   =================================================== */
+
+/* ---------- 设计变量 ---------- */
+:root {
+  --主色:         #ff6600;
+  --主色深:       #cc5200;
+  --主色浅:       rgba(255, 102, 0, 0.08);
+  --背景:         #f6f6ef;      /* HN 经典米色背景 */
+  --卡片:         #ffffff;
+  --文字:         #1a1a1a;
+  --文字辅:       #666666;
+  --边框:         #e0e0e0;
+  --链接:         #0066cc;
+  --链接悬停:     #004499;
+  --代码背景:     #f0f0f0;
+  --字体:         -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC",
+                  "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+  --字体等宽:     "Fira Code", "Cascadia Code", Consolas, "Courier New", monospace;
+  --最大宽度:     980px;
+  --圆角:         6px;
+  --间距:         1.5rem;
+}
+
+/* 暗色模式 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --背景:        #1c1c1c;
+    --卡片:        #252525;
+    --文字:        #dedede;
+    --文字辅:      #909090;
+    --边框:        #3a3a3a;
+    --链接:        #6eb3f7;
+    --链接悬停:    #9dcffa;
+    --代码背景:    #2d2d2d;
+    --主色浅:      rgba(255, 102, 0, 0.12);
+  }
+}
+
+/* ---------- 基础重置 ---------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--字体);
+  background: var(--背景);
+  color: var(--文字);
+  line-height: 1.75;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ---------- 顶部导航 ---------- */
+.site-header {
+  background: var(--主色);
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.nav-inner {
+  max-width: var(--最大宽度);
+  margin: 0 auto;
+  padding: 0 var(--间距);
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.nav-logo {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.nav-logo:hover {
+  opacity: 0.9;
+}
+
+.nav-sections {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.nav-sections a {
+  color: rgba(255, 255, 255, 0.88);
+  text-decoration: none;
+  font-size: 0.875rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 4px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.nav-sections a:hover,
+.nav-sections a.active {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+/* ---------- 面包屑 ---------- */
+.breadcrumb-wrap {
+  background: var(--卡片);
+  border-bottom: 1px solid var(--边框);
+}
+
+.breadcrumb-inner {
+  max-width: var(--最大宽度);
+  margin: 0 auto;
+  padding: 0.55rem var(--间距);
+  font-size: 0.82rem;
+  color: var(--文字辅);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.breadcrumb-inner a {
+  color: var(--文字辅);
+  text-decoration: none;
+}
+
+.breadcrumb-inner a:hover {
+  color: var(--主色);
+  text-decoration: underline;
+}
+
+.breadcrumb-inner .sep {
+  color: var(--边框);
+  margin: 0 0.1rem;
+}
+
+/* ---------- 主体区域 ---------- */
+.site-main {
+  max-width: var(--最大宽度);
+  margin: 0 auto;
+  padding: 2rem var(--间距);
+  width: 100%;
+  flex: 1;
+}
+
+/* ---------- 首页 ---------- */
+.home-wrap {
+  background: var(--卡片);
+  border-radius: var(--圆角);
+  padding: 2rem 2.5rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* ---------- 月份列表页 ---------- */
+.section-wrap {
+  background: var(--卡片);
+  border-radius: var(--圆角);
+  padding: 2rem 2.5rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.section-header h1 {
+  font-size: 1.7rem;
+  margin-bottom: 0.5rem;
+}
+
+.section-intro {
+  color: var(--文字辅);
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.group-section {
+  margin-top: 2rem;
+}
+
+.group-title {
+  font-size: 1.1rem;
+  color: var(--主色);
+  margin-bottom: 1rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid var(--主色浅);
+}
+
+/* 周度索引列表 */
+.week-list {
+  list-style: none;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.week-list li a {
+  display: inline-block;
+  padding: 0.45rem 0.9rem;
+  background: var(--主色浅);
+  border-left: 3px solid var(--主色);
+  border-radius: 0 var(--圆角) var(--圆角) 0;
+  color: var(--文字);
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+
+.week-list li a:hover {
+  background: rgba(255, 102, 0, 0.15);
+  color: var(--主色深);
+}
+
+/* 深度解读文章列表 */
+.article-list {
+  list-style: none;
+  display: grid;
+  gap: 0;
+}
+
+.article-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--边框);
+}
+
+.article-item:last-child {
+  border-bottom: none;
+}
+
+.article-link {
+  color: var(--链接);
+  text-decoration: none;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.article-link:hover {
+  color: var(--链接悬停);
+  text-decoration: underline;
+}
+
+.article-meta {
+  font-size: 0.8rem;
+  color: var(--文字辅);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ---------- 文章页 ---------- */
+.article-wrap {
+  background: var(--卡片);
+  border-radius: var(--圆角);
+  padding: 2rem 2.5rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.article-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 2px solid var(--边框);
+}
+
+.article-date {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--文字辅);
+  margin-bottom: 0.5rem;
+}
+
+.article-title {
+  font-size: 1.65rem;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.article-body {
+  margin-top: 1rem;
+}
+
+.article-back {
+  margin-top: 2.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--边框);
+  font-size: 0.9rem;
+}
+
+.article-back a {
+  color: var(--主色);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.article-back a:hover {
+  text-decoration: underline;
+}
+
+/* ---------- 通用 Markdown 内容排版 ---------- */
+.home-wrap,
+.article-body,
+.section-intro {
+
+  /* 标题 */
+  h1 { font-size: 1.7rem;  margin: 0 0 1rem;     line-height: 1.3; }
+  h2 { font-size: 1.35rem; margin: 2rem 0 0.9rem; line-height: 1.4;
+       padding-bottom: 0.35rem; border-bottom: 1px solid var(--边框); }
+  h3 { font-size: 1.15rem; margin: 1.5rem 0 0.65rem; }
+  h4 { font-size: 1rem;    margin: 1.2rem 0 0.5rem; }
+
+  h1, h2, h3, h4 { font-weight: 700; color: var(--文字); }
+
+  /* 段落 */
+  p { margin: 0.75rem 0; }
+
+  /* 链接 */
+  a { color: var(--链接); text-decoration: none; }
+  a:hover { color: var(--链接悬停); text-decoration: underline; }
+
+  /* 表格 — 带横向滚动 */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    margin: 1.25rem 0;
+    display: block;          /* 允许 overflow-x */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  th {
+    background: var(--主色);
+    color: #fff;
+    padding: 0.55rem 0.85rem;
+    text-align: left;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 0.45rem 0.85rem;
+    border-bottom: 1px solid var(--边框);
+    vertical-align: top;
+  }
+
+  tr:nth-child(even) td {
+    background: rgba(0, 0, 0, 0.02);
+  }
+
+  tr:hover td {
+    background: var(--主色浅);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    tr:nth-child(even) td { background: rgba(255,255,255,0.03); }
+  }
+
+  /* 代码 */
+  code {
+    font-family: var(--字体等宽);
+    font-size: 0.855em;
+    background: var(--代码背景);
+    padding: 0.12em 0.4em;
+    border-radius: 3px;
+  }
+
+  pre {
+    background: var(--代码背景);
+    padding: 1.1rem 1.3rem;
+    border-radius: var(--圆角);
+    overflow-x: auto;
+    margin: 1.2rem 0;
+    border-left: 3px solid var(--主色);
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  pre code {
+    background: none;
+    padding: 0;
+    font-size: inherit;
+  }
+
+  /* 引用块 */
+  blockquote {
+    border-left: 4px solid var(--主色);
+    margin: 1.2rem 0;
+    padding: 0.6rem 1.1rem;
+    background: var(--主色浅);
+    border-radius: 0 var(--圆角) var(--圆角) 0;
+    color: var(--文字辅);
+    font-style: italic;
+  }
+
+  blockquote p { margin: 0.3rem 0; }
+
+  /* 列表 */
+  ul, ol {
+    margin: 0.75rem 0;
+    padding-left: 1.6rem;
+  }
+
+  li { margin: 0.3rem 0; }
+
+  /* 分割线 */
+  hr {
+    border: none;
+    border-top: 2px solid var(--边框);
+    margin: 2.5rem 0;
+  }
+
+  /* 强调 */
+  strong { font-weight: 700; }
+  em     { font-style: italic; }
+}
+
+/* ---------- 页脚 ---------- */
+.site-footer {
+  text-align: center;
+  padding: 1.8rem var(--间距);
+  font-size: 0.82rem;
+  color: var(--文字辅);
+  border-top: 1px solid var(--边框);
+  margin-top: 3rem;
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.footer-inner a {
+  color: var(--文字辅);
+  text-decoration: none;
+}
+
+.footer-inner a:hover {
+  color: var(--主色);
+}
+
+.footer-inner .sep {
+  color: var(--边框);
+}
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 720px) {
+  .site-main {
+    padding: 1rem 0;
+  }
+
+  .home-wrap,
+  .section-wrap,
+  .article-wrap {
+    padding: 1.2rem 1rem;
+    border-radius: 0;
+  }
+
+  .article-title {
+    font-size: 1.3rem;
+  }
+
+  .nav-inner {
+    padding: 0 1rem;
+  }
+
+  .nav-sections a {
+    padding: 0.25rem 0.45rem;
+    font-size: 0.8rem;
+  }
+
+  .article-item {
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .article-link {
+    white-space: normal;
+    overflow: visible;
+  }
+}

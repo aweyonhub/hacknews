@@ -1,0 +1,38 @@
+{{- define "main" }}
+
+<article class="article-wrap">
+
+  {{/*
+    周度索引文件（week1.md、week2.md 等）和深度解读文章使用相同模板，
+    区别在于周度索引没有日期前缀，深度解读文件名以 YYYYMMDD 开头。
+  */}}
+
+  <header class="article-header">
+    {{- if .File }}
+      {{- $isWeek := hasPrefix .File.BaseFileName "week" }}
+      {{- if not $isWeek }}
+        {{- if not .Date.IsZero }}
+          <time class="article-date" datetime="{{ .Date.Format "2006-01-02" }}">
+            {{ .Date.Format "2006年01月02日" }}
+          </time>
+        {{- end }}
+      {{- end }}
+    {{- end }}
+    <h1 class="article-title">{{ .Title }}</h1>
+  </header>
+
+  <div class="article-body">
+    {{ .Content }}
+  </div>
+
+  <footer class="article-back">
+    {{- if .Parent }}
+      <a href="{{ .Parent.RelPermalink }}">← 返回 {{ .Parent.Title }}</a>
+    {{- else }}
+      <a href="{{ "/" | relURL }}">← 返回首页</a>
+    {{- end }}
+  </footer>
+
+</article>
+
+{{- end }}

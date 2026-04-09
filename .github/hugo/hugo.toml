@@ -1,0 +1,40 @@
+# Hugo 站点配置 — HackNews Digest
+# 文档：https://gohugo.io/getting-started/configuration/
+
+baseURL = "/"
+languageCode = "zh-CN"
+defaultContentLanguage = "zh"
+title = "HackNews Digest"
+
+# 从文件名中提取日期（格式：YYYYMMDD-xxx.md）
+[frontmatter]
+  date     = [":filename", ":fileModTime"]
+  lastmod  = [":fileModTime"]
+
+# Markdown 渲染设置
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true          # 允许 Markdown 中的原始 HTML
+    [markup.goldmark.parser]
+      autoHeadingID = true
+  [markup.highlight]
+    style          = "github"
+    lineNos        = false
+    guessSyntax    = true
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel   = 4
+    ordered    = false
+
+# 站点参数
+[params]
+  description = "Hacker News 热点新闻深度归档 — 每日 Top 10 采集 + 精选深度解读 + 周度趋势分析"
+  github      = "https://github.com/YOUR_USERNAME/YOUR_REPO"
+  # 上方 github 地址请替换为实际的仓库地址
+
+# 输出格式（仅 HTML）
+[outputs]
+  home    = ["HTML"]
+  page    = ["HTML"]
+  section = ["HTML"]

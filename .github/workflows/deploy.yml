@@ -1,0 +1,73 @@
+# GitHub Actions 工作流：构建 Hugo 站点并部署到 GitHub Pages
+# 触发条件：push 到 main 分支，或手动触发
+
+name: 构建并部署到 GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:        # 支持手动触发
+
+# GitHub Pages 部署所需权限
+permissions:
+  contents: read
+  pages:    write
+  id-token: write
+
+# 同一时刻只允许一个部署任务运行
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+
+  # ── 第一步：构建 ───────────────────────────────────────────
+  构建:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0        # 获取完整历史，用于 lastmod 提取
+
+      - name: 安装 Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: latest
+          extended: true        # 使用扩展版（支持 SCSS 等）
+
+      - name: 配置 GitHub Pages
+        id: pages
+        uses: actions/configure-pages@v4
+
+      - name: 准备 Hugo 内容
+        run: |
+          chmod +x .github/hugo/scripts/prepare-content.sh
+          bash .github/hugo/scripts/prepare-content.sh
+
+      - name: 构建 Hugo 站点
+        run: |
+          cd .github/hugo
+          hugo \
+            --minify \
+            --baseURL "${{ steps.pages.outputs.base_url }}/"
+        env:
+          HUGO_ENVIRONMENT: production
+
+      - name: 上传构建产物
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .github/hugo/public
+
+  # ── 第二步：部署 ───────────────────────────────────────────
+  部署:
+    needs: 构建
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url:  ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 部署到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
