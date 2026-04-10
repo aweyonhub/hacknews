@@ -1,0 +1,12 @@
+{{- $pages := slice -}}
+{{- range .Site.Pages -}}
+  {{- if and (not .IsSection) (not .IsHome) (not .Draft) -}}
+    {{- $pages = $pages | append (dict
+      "title"   .Title
+      "url"     .RelPermalink
+      "date"    (.Date.Format "2006-01-02")
+      "content" (.Plain | truncate 300)
+    ) -}}
+  {{- end -}}
+{{- end -}}
+{{- $pages | jsonify -}}

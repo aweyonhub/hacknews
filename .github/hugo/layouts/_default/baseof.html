@@ -1,68 +1,88 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="{{ if .IsHome }}{{ .Site.Params.description }}{{ else }}{{ with .Summary }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}{{ end }}" />
-
-  <title>
-    {{- if .IsHome -}}
-      {{ .Site.Title }}
-    {{- else -}}
-      {{ .Title }} | {{ .Site.Title }}
-    {{- end -}}
-  </title>
-
-  <link rel="stylesheet" href="{{ "css/style.css" | relURL }}" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="{{ if .IsHome }}{{ .Site.Params.description }}{{ else }}{{ .Title }}{{ end }}">
+  <title>{{- if .IsHome -}}{{ .Site.Title }}{{- else -}}{{ .Title }} | {{ .Site.Title }}{{- end -}}</title>
+  <link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
+  <!-- 将 baseURL 注入 JS，供搜索脚本使用 -->
+  <script>var BASE_URL = "{{ "/" | relURL }}";</script>
+  <!-- 主题初始化：在首次渲染前读取存储，避免白屏闪烁 -->
+  <script>(function(){var s=localStorage.getItem('theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s?s:(d?'dark':'light'));})()</script>
 </head>
 <body>
 
-  <!-- 顶部导航栏 -->
+  <!-- 顶部导航 -->
   <header class="site-header">
-    <nav class="nav-inner">
-      <a href="{{ "/" | relURL }}" class="nav-logo">📰 HackNews Digest</a>
+    <div class="header-inner">
+      <a href="{{ "/" | relURL }}" class="site-logo">📰 HackNews Digest</a>
 
-      <div class="nav-sections">
+      <nav class="site-nav">
         {{- range (sort .Site.Sections "Section" "desc") }}
-          <a href="{{ .RelPermalink }}"
-            {{- if eq $.Section .Section }} class="active"{{ end }}>
-            {{ .Title }}
-          </a>
+        <a href="{{ .RelPermalink }}"
+          {{- if eq $.Section .Section }} class="active"{{ end }}>{{ .Title }}</a>
         {{- end }}
-      </div>
-    </nav>
+      </nav>
+
+      <button class="search-toggle" id="searchToggle" aria-label="搜索">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span>搜索</span>
+        <kbd>⌘K</kbd>
+      </button>
+
+      <!-- 主题切换 -->
+      <button class="theme-toggle" id="themeToggle" aria-label="切换主题" title="切换白天/暗夜模式">
+        <span class="theme-icon-dark">🌙</span>
+        <span class="theme-icon-light">☀️</span>
+      </button>
+    </div>
   </header>
 
-  <!-- 面包屑导航（非首页时显示） -->
+  <!-- 搜索弹框 -->
+  <div class="search-overlay" id="searchOverlay" aria-hidden="true">
+    <div class="search-modal" role="dialog" aria-label="搜索">
+      <div class="search-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="search" id="searchInput" class="search-input" placeholder="搜索文章、周报…" autocomplete="off">
+        <button class="search-close" id="searchClose" aria-label="关闭">Esc</button>
+      </div>
+      <div class="search-results" id="searchResults">
+        <div class="search-hint">输入关键词开始搜索</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 面包屑（非首页） -->
   {{- if not .IsHome }}
-  <div class="breadcrumb-wrap">
+  <div class="breadcrumb">
     <div class="breadcrumb-inner">
       <a href="{{ "/" | relURL }}">首页</a>
       {{- if .Parent }}
-        <span class="sep">›</span>
-        <a href="{{ .Parent.RelPermalink }}">{{ .Parent.Title }}</a>
+      <span>›</span>
+      <a href="{{ .Parent.RelPermalink }}">{{ .Parent.Title }}</a>
       {{- end }}
-      <span class="sep">›</span>
+      <span>›</span>
       <span>{{ .Title }}</span>
     </div>
   </div>
   {{- end }}
 
-  <!-- 主体内容 -->
-  <main class="site-main">
+  <!-- 主体 -->
+  <main id="main">
     {{- block "main" . }}{{- end }}
   </main>
 
   <!-- 页脚 -->
   <footer class="site-footer">
     <div class="footer-inner">
-      <span>HackNews Digest — Hacker News 热点新闻深度归档系统</span>
+      <span>HackNews Digest — Hacker News 热点深度归档</span>
       {{- with .Site.Params.github }}
-        <span class="sep">·</span>
-        <a href="{{ . }}" target="_blank" rel="noopener">GitHub</a>
+      · <a href="{{ . }}" target="_blank" rel="noopener">GitHub</a>
       {{- end }}
     </div>
   </footer>
 
+  <script src="{{ "js/search.js" | relURL }}"></script>
 </body>
 </html>

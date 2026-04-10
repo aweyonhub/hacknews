@@ -62,10 +62,14 @@ def process_file(src_path, dst_path):
     if m:
         date = f'{m.group(1)}-{m.group(2)}-{m.group(3)}'
 
+    # slug 使用原始文件名（不含扩展名），保留中文字符以确保链接可正常解析
+    slug = os.path.splitext(basename)[0].replace('"', '\\"')
+
     # 拼装 front matter
     fm_lines = ['---', f'title: "{title}"']
     if date:
         fm_lines.append(f'date: "{date}"')
+    fm_lines.append(f'slug: "{slug}"')
     fm_lines.extend(['---', ''])
 
     with open(dst_path, 'w', encoding='utf-8') as f:

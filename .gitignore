@@ -2,6 +2,7 @@
 .github/hugo/content/
 .github/hugo/public/
 .github/hugo/resources/
+.github/hugo/.hugo_build.lock
 
 # 系统文件
 .DS_Store

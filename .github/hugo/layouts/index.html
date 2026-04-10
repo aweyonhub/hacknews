@@ -1,9 +1,54 @@
 {{- define "main" }}
 
-<div class="home-wrap">
-  <div class="home-content">
-    {{ .Content }}
-  </div>
+{{/* 动态统计页面数 */}}
+{{- $totalWeeks := 0 }}
+{{- $totalArticles := 0 }}
+{{- range .Site.Pages }}
+  {{- if and (not .IsSection) (not .IsHome) }}
+    {{- if and .File (hasPrefix .File.BaseFileName "week") }}
+      {{- $totalWeeks = add $totalWeeks 1 }}
+    {{- else }}
+      {{- $totalArticles = add $totalArticles 1 }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+
+<div class="home">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-inner">
+      <h1 class="hero-title">HackNews <span class="gradient-text">Digest</span></h1>
+      <p class="hero-desc">{{ .Site.Params.description }}</p>
+      <div class="stats-bar">
+        <div class="stat"><span class="stat-n">{{ mul (len .Site.Sections) 10 }}+</span><span class="stat-l">新闻条目</span></div>
+        <div class="stat"><span class="stat-n">{{ $totalArticles }}</span><span class="stat-l">深度解读</span></div>
+        <div class="stat"><span class="stat-n">{{ $totalWeeks }}</span><span class="stat-l">周度索引</span></div>
+        <div class="stat"><span class="stat-n">{{ len .Site.Sections }}</span><span class="stat-l">覆盖月份</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 月份导航 -->
+  {{- if .Site.Sections }}
+  <section class="month-nav">
+    {{- range (sort .Site.Sections "Section" "desc") }}
+    <a href="{{ .RelPermalink }}" class="month-card">
+      <div class="month-label">{{ .Title }}</div>
+      <div class="month-count">{{ len .Pages }} 篇内容</div>
+      <span class="month-arrow">→</span>
+    </a>
+    {{- end }}
+  </section>
+  {{- end }}
+
+  <!-- README 内容 -->
+  {{- with .Content }}
+  <section class="readme-section">
+    <div class="readme-inner">{{ . }}</div>
+  </section>
+  {{- end }}
+
 </div>
 
 {{- end }}

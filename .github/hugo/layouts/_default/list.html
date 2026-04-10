@@ -1,53 +1,49 @@
 {{- define "main" }}
 
-<div class="section-wrap">
+{{- $weeks    := slice }}
+{{- $articles := slice }}
+{{- range .Pages }}
+  {{- if and .File (hasPrefix .File.BaseFileName "week") }}
+    {{- $weeks = $weeks | append . }}
+  {{- else }}
+    {{- $articles = $articles | append . }}
+  {{- end }}
+{{- end }}
 
-  <header class="section-header">
-    <h1>{{ .Title }}</h1>
-    {{- with .Content }}
-      <div class="section-intro">{{ . }}</div>
-    {{- end }}
+<div class="section-page">
+
+  <header class="section-hero">
+    <h1 class="section-title gradient-text">{{ .Title }}</h1>
+    <p class="section-desc">{{ .Site.Params.description }}</p>
   </header>
 
-  {{/* 分离周度索引和深度解读文章 */}}
-  {{- $weeks    := slice }}
-  {{- $articles := slice }}
-  {{- range .Pages }}
-    {{- if and .File (hasPrefix .File.BaseFileName "week") }}
-      {{- $weeks = $weeks | append . }}
-    {{- else }}
-      {{- $articles = $articles | append . }}
-    {{- end }}
-  {{- end }}
-
-  {{/* 周度索引列表 */}}
   {{- if $weeks }}
-  <section class="group-section">
-    <h2 class="group-title">📅 周度索引</h2>
-    <ul class="week-list">
+  <section class="content-group">
+    <h2 class="group-heading">📅 周度索引</h2>
+    <div class="week-grid">
       {{- range sort $weeks "Title" "asc" }}
-        <li>
-          <a href="{{ .RelPermalink }}">{{ .Title }}</a>
-        </li>
+      <a href="{{ .RelPermalink }}" class="week-card">
+        <div class="week-card-title">{{ .Title }}</div>
+        <span class="week-card-arrow">→</span>
+      </a>
       {{- end }}
-    </ul>
+    </div>
   </section>
   {{- end }}
 
-  {{/* 深度解读文章列表 */}}
   {{- if $articles }}
-  <section class="group-section">
-    <h2 class="group-title">📝 深度解读（{{ len $articles }} 篇）</h2>
-    <ul class="article-list">
+  <section class="content-group">
+    <h2 class="group-heading">📝 深度解读 <span class="count-badge">{{ len $articles }}</span></h2>
+    <div class="article-grid">
       {{- range $articles.ByDate.Reverse }}
-        <li class="article-item">
-          <a href="{{ .RelPermalink }}" class="article-link">{{ .Title }}</a>
-          {{- if not .Date.IsZero }}
-            <time class="article-meta">{{ .Date.Format "01月02日" }}</time>
-          {{- end }}
-        </li>
+      <a href="{{ .RelPermalink }}" class="article-card">
+        {{- if not .Date.IsZero }}
+        <time class="article-card-date">{{ .Date.Format "01-02" }}</time>
+        {{- end }}
+        <div class="article-card-title">{{ .Title }}</div>
+      </a>
       {{- end }}
-    </ul>
+    </div>
   </section>
   {{- end }}
 

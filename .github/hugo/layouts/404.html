@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 — 页面不存在 | HackNews Digest</title>
+  <link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
+  <script>
+    // 如果 URL 以 .md 结尾，自动跳转到对应的 Hugo 生成页面
+    (function () {
+      var p = window.location.pathname;
+      if (p.endsWith('.md')) {
+        window.location.replace(p.replace(/\.md$/, '/'));
+      }
+    })();
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="{{ "/" | relURL }}" class="site-logo">📰 HackNews Digest</a>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="error-page">
+      <div class="error-code">404</div>
+      <h1 class="error-title">页面不存在</h1>
+      <p class="error-desc">
+        如果你通过 <code>.md</code> 结尾的链接访问，正在自动跳转到正确页面…<br>
+        否则该页面可能已被移动或删除。
+      </p>
+      <div class="error-actions">
+        <a href="{{ "/" | relURL }}" class="btn btn-primary">← 回到首页</a>
+        <button class="btn btn-secondary" onclick="history.back()">返回上一页</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">HackNews Digest</div>
+  </footer>
+</body>
+</html>

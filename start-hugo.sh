@@ -130,11 +130,19 @@ cmd_clean() {
     ((cleaned++))
   fi
 
+  # 清理 Hugo 构建锁文件
+  local lock_file="$HUGO_DIR/.hugo_build.lock"
+  if [[ -f "$lock_file" ]]; then
+    rm -f "$lock_file"
+    echo "  🗑  已删除：$lock_file"
+    ((cleaned++))
+  fi
+
   echo ""
   if [[ $cleaned -eq 0 ]]; then
     info "没有需要清理的文件。"
   else
-    success "清理完成，共删除 $cleaned 个目录。"
+    success "清理完成，共删除 $cleaned 个项目。"
   fi
 }
 
