@@ -34,8 +34,8 @@ title = "HackNews Digest"
   github      = "https://github.com/aweyonhub/hacknews"
   # 上方 github 地址请替换为实际的仓库地址
 
-# 保留文件名大小写（确保含中文的链接可正常解析）
-disablePathToLower = true
+# 统一 URL 为小写，避免 GitHub Pages 大小写敏感问题
+disablePathToLower = false
 
 # 输出格式（home 额外输出 JSON 用于搜索索引）
 [outputs]

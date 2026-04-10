@@ -62,8 +62,8 @@ def process_file(src_path, dst_path):
     if m:
         date = f'{m.group(1)}-{m.group(2)}-{m.group(3)}'
 
-    # slug 使用原始文件名（不含扩展名），保留中文字符以确保链接可正常解析
-    slug = os.path.splitext(basename)[0].replace('"', '\\"')
+    # slug 使用原始文件名（不含扩展名），转换为小写以确保链接一致性
+    slug = os.path.splitext(basename)[0].lower().replace('"', '\\"')
 
     # 拼装 front matter
     fm_lines = ['---', f'title: "{title}"']
