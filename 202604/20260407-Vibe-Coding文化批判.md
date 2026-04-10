@@ -31,6 +31,8 @@ Claude 最近发生了源码泄露（之前 ccunpacked.dev 的可视化分析也
 
 ## Bram 的正确方法论
 
+Bram 分享了他自己使用 AI 编程的工作方式，值得每个开发者参考：
+
 ### 1. 先审计，再动工
 
 ```
@@ -57,7 +59,7 @@ Claude 最近发生了源码泄露（之前 ccunpacked.dev 的可视化分析也
 ### 5. 质量是决策
 
 > "People have bad quality software because they decide to have bad quality software."
-
+> （人们写出烂软件，是因为他们决定要烂。）
 ---
 
 ## 具体修复示例
