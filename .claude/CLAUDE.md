@@ -390,3 +390,36 @@ hacknews/
 
 📋 检查结果: 无异常 / 发现 X 处需注意的问题
 ```
+
+---
+
+## Hugo 静态网站部署
+
+项目已集成 Hugo 静态网站生成器，可将 Markdown 内容生成美观的网站并自动部署到 GitHub Pages。
+
+### 目录结构
+```
+hacknews/
+├── .github/
+│   ├── hugo/                  ← Hugo 站点源码
+│   │   ├── hugo.toml          ← 站点配置
+│   │   ├── layouts/           ← HTML 模板
+│   │   ├── static/            ← 静态资源（CSS/JS）
+│   │   └── scripts/prepare-content.sh  ← 内容同步脚本
+│   ├── workflows/deploy.yml   ← GitHub Actions 自动部署
+│   └── 操作指引.md             ← 详细操作说明
+└── start-hugo.sh              ← 本地启动脚本
+```
+
+### 本地开发
+```bash
+./start-hugo.sh start    # 启动开发服务器（http://localhost:1313）
+./start-hugo.sh build    # 构建生产版本
+./start-hugo.sh clean    # 清理临时文件
+./start-hugo.sh help     # 查看帮助
+```
+
+### 自动部署
+- 每次 push 到 `main` 分支，GitHub Actions 自动构建并部署
+- 站点地址：`https://aweyonhub.github.io/`
+- 搜索功能：支持全文搜索和主题切换
