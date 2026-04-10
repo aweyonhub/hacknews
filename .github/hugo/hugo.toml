@@ -1,7 +1,7 @@
 # Hugo 站点配置 — HackNews Digest
 # 文档：https://gohugo.io/getting-started/configuration/
 
-baseURL = "/"
+baseURL = "https://aweyonhub.github.io/"
 languageCode = "zh-CN"
 defaultContentLanguage = "zh"
 title = "HackNews Digest"
@@ -19,10 +19,10 @@ title = "HackNews Digest"
     [markup.goldmark.parser]
       autoHeadingID = true
   [markup.highlight]
-    style          = "github-dark"   # 暗色代码高亮主题
+    style          = "github"        # 使用类名模式，便于 CSS 切换主题
     lineNos        = false
     guessSyntax    = true
-    noClasses      = true
+    noClasses      = false
   [markup.tableOfContents]
     startLevel = 2
     endLevel   = 4
